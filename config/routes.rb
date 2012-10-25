@@ -1,4 +1,8 @@
 App::Application.routes.draw do
+  
+  root :to => 'tasks#index'
+  match "/tasks/1" => "tasks#first", :as => :first_task
+  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
