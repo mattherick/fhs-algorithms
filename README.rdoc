@@ -6,3 +6,9 @@ Probably it is not really interesting for people outside of this lecture :-).
 
 You can download the data for the database here:
 http://www.informatik.uni-freiburg.de/~cziegler/BX/
+
+And after that you just have to import the sql files:
+For example your database is called "algorithms"
+mysql -u root -p  algorithms < BX-Users.sql
+mysql -u root -p  algorithms < BX-Books.sql
+mysql -u root -p  algorithms < BX-Book-Ratings.sql
