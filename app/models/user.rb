@@ -16,8 +16,25 @@ class User < ActiveRecord::Base
     ).group("`BX-Users`.`User-ID`").having("count(`BX-Book-Ratings`.`Book-Rating`) >= 7")
   end
 
+  def self.pearson
+    user = User.find(276688)
+
+    result = {}
+    task_1c.each do |user2|
+      next if user2.id == user.id
+
+      ratings = Rating.where("User-ID" => user.id, :ISBN => user2.ratings.map(&:ISBN)).map(&:"Book-Rating")
+      ratings2 = Rating.where("User-ID" => user2.id, :ISBN => user.ratings.map(&:ISBN)).map(&:"Book-Rating")
+ 
+      sxy = sxy(ratings, ratings2)
+      sxsy = sxsy(ratings, ratings2)
+      result[user2.id] = (sxy.zero? || sxsy.zero?) ? 0.0 : (sxy / sxsy)
+    end
+    result
+  end
+
   # Task 1b
-  # Calculate 푥 , 푠푥 of Users "1903", "2033", and "2766". Compare the values? 
+  # Calculate x, sx of Users "1903", "2033", and "2766". Compare the values? 
   # What do these values tell us?
   def self.task_1b
       
@@ -27,7 +44,12 @@ class User < ActiveRecord::Base
   # User.find("2033").arithmetic_avg
   # User.find("2766").arithmetic_avg
   def arithmetic_avg
-    ratings.map(&:"Book-Rating").sum.to_f / ratings.count
+    array = ratings.map(&:"Book-Rating")
+    array.sum.to_f / array.length
+  end
+
+  def self.arithmetic_avg array
+    array.sum.to_f / array.length
   end
 
   # User.find("1903").sx
@@ -40,6 +62,32 @@ class User < ActiveRecord::Base
     end
     Math.sqrt(sum/(ratings.count-1))
   end
+
+  def self.sxy ratings, ratings2
+    raise if ratings.length != ratings2.length
+    sum = 0
+    avg = arithmetic_avg ratings
+    avg2 = arithmetic_avg ratings2
+    ratings.each_with_index do |rating, i|
+      sum += ((rating - avg) * (ratings2[i] - avg2))
+    end
+    sum
+  end
+
+  def self.sxsy ratings, ratings2
+    avg = arithmetic_avg ratings
+    avg2 = arithmetic_avg ratings2
+    sum = 0
+    ratings.each do |rating|
+      sum += (rating - avg)**2
+    end
+    sum2 = 0
+    ratings2.each do |rating|
+      sum2 += (rating - avg2)**2
+    end
+    Math.sqrt(sum) * Math.sqrt(sum2)
+  end
+
 end
 
 # Schema
