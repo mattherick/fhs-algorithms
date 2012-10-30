@@ -5,21 +5,21 @@ class User < ActiveRecord::Base
   has_many :ratings, :foreign_key => "User-ID"
   has_many :books, :through => :ratings, :foreign_key => ["User-ID", "ISBN"]
   
-  # Task 3
+  # Task 1c
   # Find the most similar user to user "276688" with respect to his/her ratings calculated using 
   # Pearson correlation, Spearman correlation, Cosine similarity 
   # (calculate the values only based on mutually rated values). 
   # Evaluate only users that have at least 7 ratings with user "276688" in common.
-  def self.task3
+  def self.task_1c
     User.joins(:ratings).where(
       "BX-Book-Ratings.ISBN" => User.find(276688).ratings.map(&:ISBN)
     ).group("`BX-Users`.`User-ID`").having("count(`BX-Book-Ratings`.`Book-Rating`) >= 7")
   end
 
-  # Task 2
-  # Calculate 𝑥 , 𝑠𝑥 of Users "1903", "2033", and "2766". Compare the values? 
+  # Task 1b
+  # Calculate 푥 , 푠푥 of Users "1903", "2033", and "2766". Compare the values? 
   # What do these values tell us?
-  def self.task2
+  def self.task_1b
       
   end
 

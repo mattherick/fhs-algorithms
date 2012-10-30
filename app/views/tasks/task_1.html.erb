@@ -1,0 +1,34 @@
+<h1>First Task</h1>
+
+<h3>1a</h3>
+
+<p>Book "0316095648"</p>
+
+<ul>
+  <li>Arithmetic average: <%= @task_1a.first[:arithmetic_avg] %></li>
+  <li>Median: <%= @task_1a.first[:median] %></li>
+  <li>Quantil: <%= @task_1a.first[:quantil] %></li>
+</ul>
+
+<p>Book "0971880107" </p>
+
+<ul>
+  <li>Arithmetic average: <%= @task_1a.second[:arithmetic_avg] %></li>
+  <li>Median: <%= @task_1a.second[:median] %></li>
+  <li>Quantil: <%= @task_1a.second[:quantil] %></li>
+</ul>
+
+<p>Book "0446610038" </p>
+
+<ul>
+  <li>Arithmetic average: <%= @task_1a.last[:arithmetic_avg] %></li>
+  <li>Median: <%= @task_1a.last[:median] %></li>
+  <li>Quantil: <%= @task_1a.last[:quantil] %></li>
+</ul>
+
+<p>Message of those values</p>
+
+<p>Most of the book ratings have a value of 0. For example the first book 4/7. Book 2 has 1921/2502. Book 3 has 214/391.<br/>
+  That´s the raison why it is not really a surprise that there are so much 0 in the results.</p>
+
+<p><%= link_to "Back to overview", root_path %></p>
