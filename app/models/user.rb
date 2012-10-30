@@ -41,7 +41,7 @@ class User < ActiveRecord::Base
   # (calculate the values only based on mutually rated values). 
   # Evaluate only users that have at least 7 ratings with user "276688" in common.
   def self.task_1c
-    @task_1c = { :pearson => pearson, :spearman => spearman, :cosine => cosine }
+    { :pearson => pearson, :spearman => spearman, :cosine => cosine }
   end
 
   def self.pearson
@@ -96,7 +96,7 @@ class User < ActiveRecord::Base
   
   def self.calculate_similarity ratings, ratings2
     dp = dot_product ratings, ratings2
-    nv = (normalize ratings) * (normalize ratings)
+    nv = (normalize ratings) * (normalize ratings2)
     dp.to_f/nv.to_f
   end
   

@@ -2,7 +2,7 @@
 
 <h3>1a</h3>
 <p>
-Calculate 푥 ,푥 and 푥 0.25 of the ratings of books "0316095648", "0971880107", and "0446610038". What is the message of those values?
+Calculate x, x and x0.25 of the ratings of books "0316095648", "0971880107", and "0446610038". What is the message of those values?
 </p>
 
 <% @task_1a.each do |book| %>
@@ -25,7 +25,7 @@ Calculate 푥 ,푥 and 푥 0.25 of the ratings of books "0316095648", "097188010
 
 <h3>1b</h3>
 <p>
-Calculate 푥 , 푠푥 of Users "1903", "2033", and "2766". Compare the values? What do these values tell us?
+Calculate x, sx of Users "1903", "2033", and "2766". Compare the values? What do these values tell us?
 </p>
 
 <% @task_1b.each do |user| %>
@@ -39,19 +39,37 @@ Calculate 푥 , 푠푥 of Users "1903", "2033", and "2766". Compare the values? 
 
 <h4>Interpretation</h4>
 <p>
-User "2033" bewertet allgmein höher als die beiden anderen, hat aber eine höhere Standardabweichung. Die User "1903" und "2766" sind sich sehr ähnlich.
+User "2033" bewertet allgemein höher als die beiden anderen, hat aber eine höhere Standardabweichung. Die User "1903" und "2766" sind sich sehr ähnlich, hinsichtlich des arithmetischen Mittel. Aber da der User "1903" eine höhere Standardabweichung hat, bewertet er unterschiedlicher als User "2766".
 </p>
 
 
 <h3>1c</h3>
+<p>
+Find the most similar user to user "276688" with respect to his/her ratings calculated using Pearson correlation, Spearman correlation, Cosine similarity.  
+</p>
 
 <h4>Interpretation</h4>
-
-<% @task_1c.each do |algorithm| %>
-  <p>Algorithmus "<%= algorithm %>"</p>
-<% end %>
 <p>
-  Der Pearson Correlation ist bei User "166596" mit 0.6011130897782883 am höchsten. 
+  <b>Pearson</b> <br/>
+  <% @task_1c[:pearson].each do |k,v| %>
+   <%= "User #{k}: #{v}" %> <br/>
+  <% end %> 
+</p>
+<p>
+  <b>Spearman</b> <br/>
+  <% @task_1c[:spearman].each do |k,v| %>
+   <%= "User #{k}: #{v}" %> <br/>
+  <% end %> 
+</p>
+<p>
+  <b>Cosine</b> <br/>
+  <% @task_1c[:cosine].each do |k,v| %>
+   <%= "User #{k}: #{v}" %> <br/>
+  <% end %> 
+</p>
+<p>
+  Bei der Pearson Correlation ist der User "166596" mit 0.6011130897782883 am höchsten bzw. dem User "276688" am ähnlichsten.<br/> Auch bei der Spearman Correlation und der Cosine Similarity ist es der GLEICHE User mit 0.641688947919748 und 0.6537204504606134.<br/>
+  Bei einigen Usern konnte keine Ähnlichkeit festgestellt werden, da die meisten Bücher mit 0 bewertet wurden (Division durch 0 ist nicht möglich! --> Ergebnis durch die Algorithmen = 0)
 </p>
 
 <p><%= link_to "Back to overview", root_path %></p>
