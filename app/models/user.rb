@@ -26,7 +26,9 @@ class User < ActiveRecord::Base
       ratings = Rating.where("User-ID" => user.id, :ISBN => user2.ratings.map(&:ISBN)).map(&:"Book-Rating")
       ratings2 = Rating.where("User-ID" => user2.id, :ISBN => user.ratings.map(&:ISBN)).map(&:"Book-Rating")
  
-      result[user2.id] = (sxy(ratings, ratings2) / sxsy(ratings, ratings2))
+      sxy = sxy(ratings, ratings2)
+      sxsy = sxsy(ratings, ratings2)
+      result[user2.id] = (sxy.zero? || sxsy.zero?) ? 0.0 : (sxy / sxsy)
     end
     result
   end
