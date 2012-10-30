@@ -1,12 +1,12 @@
-class Book < ActiveRecord::Base  
+class Book < ActiveRecord::Base
   set_table_name "BX-Books"
   set_primary_key "ISBN"
-  
+
   has_many :ratings, :foreign_key => "ISBN"
   has_many :users, :through => :ratings, :foreign_key => ["User-ID", "ISBN"]
 
   # Task 1a
-  # Calculate 푥 ,푥 and 푥 0.25 of the ratings of books "0316095648", "0971880107", and "0446610038". 
+  # Calculate 푥 ,푥 and 푥 0.25 of the ratings of books "0316095648", "0971880107", and "0446610038".
   # What is the message of those values?
   def self.task_1a
     @task_1a = []
@@ -14,20 +14,20 @@ class Book < ActiveRecord::Base
     book2 = Book.find("0971880107")
     book3 = Book.find("0446610038")
     book_1 = { :id => book1.id,
-               :arithmetic_avg => book1.arithmetic_avg, 
-               :median =>  book1.median,
-               :quantil => book1.quantil
-             }
+      :arithmetic_avg => book1.arithmetic_avg,
+      :median =>  book1.median,
+      :quantil => book1.quantil
+    }
     book_2 = { :id => book2.id,
-               :arithmetic_avg => book2.arithmetic_avg, 
-               :median =>  book2.median,
-               :quantil => book2.quantil
-             }
+      :arithmetic_avg => book2.arithmetic_avg,
+      :median =>  book2.median,
+      :quantil => book2.quantil
+    }
     book_3 = { :id => book3.id,
-               :arithmetic_avg => book3.arithmetic_avg, 
-               :median =>  book3.median,
-               :quantil => book3.quantil
-             }
+      :arithmetic_avg => book3.arithmetic_avg,
+      :median =>  book3.median,
+      :quantil => book3.quantil
+    }
     @task_1a << book_1
     @task_1a << book_2
     @task_1a << book_3
@@ -45,7 +45,7 @@ class Book < ActiveRecord::Base
   # Book.find("0446610038").median
   def median
     ratings_array = ratings.map(&:'Book-Rating').sort!
-    
+
     if ratings_array.count % 2 == 0 # even
       i = ratings_array.count/2
       median = (ratings_array[i-1] + ratings_array[i])/2
@@ -62,7 +62,7 @@ class Book < ActiveRecord::Base
   def quantil(p=0.25)
     ratings_array = ratings.map(&:'Book-Rating').sort!
     np = ratings_array.count * p
-    
+
     if np.integer?  # 푛푝 ∈ ℕ
       quantil = (ratings_array[np-1] + ratings_array[np])/2
     else # 푛푝 ∉ ℕ

@@ -2,7 +2,7 @@
 
 <h3>1a</h3>
 <p>
-Calculate 𝑥 ,𝑥 and 𝑥 0.25 of the ratings of books "0316095648", "0971880107", and "0446610038". What is the message of those values?
+Calculate 푥 ,푥 and 푥 0.25 of the ratings of books "0316095648", "0971880107", and "0446610038". What is the message of those values?
 </p>
 
 <% @task_1a.each do |book| %>
@@ -25,7 +25,7 @@ Calculate 𝑥 ,𝑥 and 𝑥 0.25 of the ratings of books "0316095648", "097188
 
 <h3>1b</h3>
 <p>
-Calculate 𝑥 , 𝑠𝑥 of Users "1903", "2033", and "2766". Compare the values? What do these values tell us?
+Calculate 푥 , 푠푥 of Users "1903", "2033", and "2766". Compare the values? What do these values tell us?
 </p>
 
 <% @task_1b.each do |user| %>
@@ -45,11 +45,13 @@ User "2033" bewertet allgmein höher als die beiden anderen, hat aber eine höhe
 
 <h3>1c</h3>
 
-
 <h4>Interpretation</h4>
+
+<% @task_1c.each do |algorithm| %>
+  <p>Algorithmus "<%= algorithm %>"</p>
+<% end %>
 <p>
   Der Pearson Correlation ist bei User "166596" mit 0.6011130897782883 am höchsten. 
-
 </p>
 
 <p><%= link_to "Back to overview", root_path %></p>
