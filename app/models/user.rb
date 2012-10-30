@@ -37,7 +37,25 @@ class User < ActiveRecord::Base
   # Calculate x, sx of Users "1903", "2033", and "2766". Compare the values? 
   # What do these values tell us?
   def self.task_1b
-      
+    @task_1b = []
+    user1 = User.find("1903")
+    user2 = User.find("2033")
+    user3 = User.find("2766")
+    user1 = { :id => user1.id,
+               :arithmetic_avg => user1.arithmetic_avg, 
+               :sx =>  user1.sx
+             }
+    user2 = { :id => user2.id,
+               :arithmetic_avg => user2.arithmetic_avg, 
+               :sx =>  user2.sx
+             }
+    user3 = { :id => user3.id,
+               :arithmetic_avg => user3.arithmetic_avg, 
+               :sx =>  user3.sx
+             }
+    @task_1b << user1
+    @task_1b << user2
+    @task_1b << user3
   end
 
   # User.find("1903").arithmetic_avg

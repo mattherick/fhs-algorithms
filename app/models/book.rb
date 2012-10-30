@@ -13,15 +13,18 @@ class Book < ActiveRecord::Base
     book1 = Book.find("0316095648")
     book2 = Book.find("0971880107")
     book3 = Book.find("0446610038")
-    book_1 = { :arithmetic_avg => book1.arithmetic_avg, 
+    book_1 = { :id => book1.id,
+               :arithmetic_avg => book1.arithmetic_avg, 
                :median =>  book1.median,
                :quantil => book1.quantil
              }
-    book_2 = { :arithmetic_avg => book2.arithmetic_avg, 
+    book_2 = { :id => book2.id,
+               :arithmetic_avg => book2.arithmetic_avg, 
                :median =>  book2.median,
                :quantil => book2.quantil
              }
-    book_3 = { :arithmetic_avg => book3.arithmetic_avg, 
+    book_3 = { :id => book3.id,
+               :arithmetic_avg => book3.arithmetic_avg, 
                :median =>  book3.median,
                :quantil => book3.quantil
              }

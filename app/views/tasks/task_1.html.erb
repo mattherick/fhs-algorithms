@@ -1,34 +1,55 @@
 <h1>First Task</h1>
 
 <h3>1a</h3>
+<p>
+Calculate 𝑥 ,𝑥 and 𝑥 0.25 of the ratings of books "0316095648", "0971880107", and "0446610038". What is the message of those values?
+</p>
 
-<p>Book "0316095648"</p>
+<% @task_1a.each do |book| %>
+  <p>Buch "<%= book[:id] %>"</p>
 
-<ul>
-  <li>Arithmetic average: <%= @task_1a.first[:arithmetic_avg] %></li>
-  <li>Median: <%= @task_1a.first[:median] %></li>
-  <li>Quantil: <%= @task_1a.first[:quantil] %></li>
-</ul>
+  <ul>
+    <li>Arithmetic average: <%= book[:arithmetic_avg] %></li>
+    <li>Median: <%= book[:median] %></li>
+    <li>Quantil: <%= book[:quantil] %></li>
+  </ul>
+<% end %>
 
-<p>Book "0971880107" </p>
+<h4>Interpretation</h4>
 
-<ul>
-  <li>Arithmetic average: <%= @task_1a.second[:arithmetic_avg] %></li>
-  <li>Median: <%= @task_1a.second[:median] %></li>
-  <li>Quantil: <%= @task_1a.second[:quantil] %></li>
-</ul>
+<p>
+  Die meisten Buchbewertungen haben einen Wert von 0, zB ist das erste Buch mit 4 Nullen von insgesamt 7 Werten bewertet. Bei den anderen beiden sind auch überwiegend Nullen.
+  <br/>
+  Deshalb ist das Ergebnis bei allen 3 Büchern bei Median und p-Quantil gleich: 0.<br/>
+</p>
 
-<p>Book "0446610038" </p>
+<h3>1b</h3>
+<p>
+Calculate 𝑥 , 𝑠𝑥 of Users "1903", "2033", and "2766". Compare the values? What do these values tell us?
+</p>
 
-<ul>
-  <li>Arithmetic average: <%= @task_1a.last[:arithmetic_avg] %></li>
-  <li>Median: <%= @task_1a.last[:median] %></li>
-  <li>Quantil: <%= @task_1a.last[:quantil] %></li>
-</ul>
+<% @task_1b.each do |user| %>
+  <p>User "<%= user[:id] %>"</p>
 
-<p>Message of those values</p>
+  <ul>
+    <li>Arithmetic average: <%= user[:arithmetic_avg] %></li>
+    <li>sx: <%= user[:sx] %></li>
+  </ul>
+<% end %>
 
-<p>Most of the book ratings have a value of 0. For example the first book 4/7. Book 2 has 1921/2502. Book 3 has 214/391.<br/>
-  That´s the raison why it is not really a surprise that there are so much 0 in the results.</p>
+<h4>Interpretation</h4>
+<p>
+User "2033" bewertet allgmein höher als die beiden anderen, hat aber eine höhere Standardabweichung. Die User "1903" und "2766" sind sich sehr ähnlich.
+</p>
+
+
+<h3>1c</h3>
+
+
+<h4>Interpretation</h4>
+<p>
+  Der Pearson Correlation ist bei User "166596" mit 0.6011130897782883 am höchsten. 
+
+</p>
 
 <p><%= link_to "Back to overview", root_path %></p>
