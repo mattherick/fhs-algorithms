@@ -11,7 +11,9 @@ class TasksController < ApplicationController
 
   def task_2
     @users = User.joins(:ratings).where("`BX-Book-Ratings`.`Book-Rating` > 0")
-      .order("`BX-Book-Ratings`.`Book-Rating`").uniq.limit(50)
+      .group("`BX-Users`.`User-ID`")
+      .order("count(`BX-Book-Ratings`.`Book-Rating`) DESC")
+      .limit(50)
   end
   
 end
