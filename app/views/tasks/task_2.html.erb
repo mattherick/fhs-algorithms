@@ -1,0 +1,11 @@
+<h1>Task 2</h1>
+
+<h3><%= @users.map(&:id).count %> Benutzer mit den meisten Bewertungen (!= 0)</h3>
+<p>
+  User-ID: Anzahl der Ratings<br />
+  <% @users.each do |user| %>
+    <%= "User #{user.id}:  #{user.ratings.count}" %><br />
+  <% end %>
+</p>
+
+<p><%= link_to "Back to overview", root_path %></p>

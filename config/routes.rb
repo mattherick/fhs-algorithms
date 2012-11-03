@@ -1,7 +1,8 @@
 App::Application.routes.draw do
   
   root :to => 'tasks#index'
-  match "/tasks/1" => "tasks#task_1", :as => :first_task
+  match "/tasks/1" => "tasks#task_1", :as => :task1
+  match "/tasks/2" => "tasks#task_2", :as => :task2
   
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -8,5 +8,10 @@ class TasksController < ApplicationController
     @task_1b = User.task_1b
     @task_1c = User.task_1c
   end
+
+  def task_2
+    @users = User.joins(:ratings).where("`BX-Book-Ratings`.`Book-Rating` > 0")
+      .order("`BX-Book-Ratings`.`Book-Rating`").uniq.limit(50)
+  end
   
 end
