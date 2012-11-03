@@ -9,6 +9,11 @@ class User < ActiveRecord::Base
   has_many :books, :through => :ratings, :foreign_key => ["User-ID", "ISBN"]
   
   include GSL
+  # Task 2
+  def ratings_except0
+    ratings.where("`Book-Rating` > 0")
+  end
+
   
   # Task 1b
   # Calculate x, sx of Users "1903", "2033", and "2766". Compare the values? 
