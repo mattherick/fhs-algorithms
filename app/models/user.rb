@@ -1,5 +1,6 @@
 require "GSL"
 require 'statsample'
+require 'csv'
 
 class User < ActiveRecord::Base
   set_table_name "BX-Users"
@@ -12,6 +13,45 @@ class User < ActiveRecord::Base
   # Task 2
   def ratings_except0
     ratings.where("`Book-Rating` > 0")
+  end
+
+  def self.generate_csv
+    @users = User.joins(:ratings).where("`BX-Book-Ratings`.`Book-Rating` > 0")
+      .group("`BX-Users`.`User-ID`")
+      .order("count(`BX-Book-Ratings`.`Book-Rating`) DESC").limit(1)
+    
+    @rel_fq = {} # relative frequency = relative Haeufigkeit
+    @users.each do |user|
+      (1..10).each do |i|
+        @rel_fq[user.id] ||= []
+        # relative Haeufigkeit, zB (Anzahl der 1en)/10
+        count_per_rating = user.ratings_except0.where("`BX-Book-Ratings`.`Book-Rating` = #{i}").count
+        @rel_fq[user.id] << count_per_rating/user.ratings_except0.count.to_f
+      end
+    end
+    CSV.open("generated_rating.csv", "w") do |csv|
+      csv << [""] + @users.map(&:id)
+      interval = 0 # 0..1
+      Book.all.each_with_index do |book, i|
+        @users.each do |user|
+          csv << [book.ISBN] + generate_rating(user, book, @rel_fq)
+        end
+      end
+    end
+  end
+
+  # user, relative frequency (Hash)
+  def self.generate_rating user, book, fq
+    rating = []    
+      #rating << book.ISBN
+      if existing = user.ratings_except0.where(:ISBN => book.ISBN).first
+        rating << existing.send("Book-Rating")
+      # else
+      #   books_to_rate_count = Book.count - user.ratings_except0.count
+      #   books_to_rate_count * fq[user.id] # [0,1,..,10]
+      #   rating << Random.new.rand(1..10)
+      end
+    rating
   end
 
   
