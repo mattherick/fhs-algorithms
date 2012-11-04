@@ -15,13 +15,16 @@ class User < ActiveRecord::Base
     ratings.where("`Book-Rating` > 0")
   end
 
-  def self.generate_csv
-    @users = User.joins(:ratings).where("`BX-Book-Ratings`.`Book-Rating` > 0")
+  # Task 2 SQL (50 Benutzer mit den meisten Bewertungen)
+  def self.users2
+    User.joins(:ratings).where("`BX-Book-Ratings`.`Book-Rating` > 0")
       .group("`BX-Users`.`User-ID`")
-      .order("count(`BX-Book-Ratings`.`Book-Rating`) DESC").limit(2)
-    
+      .order("count(`BX-Book-Ratings`.`Book-Rating`) DESC").limit(10)
+  end
+
+  def self.generate_csv
     @rel_fq = {} # relative frequency = relative Haeufigkeit
-    @users.each do |user|
+    users2.each do |user|
       (1..10).each do |i|
         @rel_fq[user.id] ||= []
         # relative Haeufigkeit, zB (Anzahl der 1en)/10
@@ -31,11 +34,10 @@ class User < ActiveRecord::Base
     end
     
     CSV.open("generated_rating.csv", "w") do |csv|
-      csv << [""] + @users.map(&:id)
+      csv << [""] + users2.map(&:id)
       Book.all.each do |book|
-      #Book.limit(10).each do |book|
         row_data = []
-        @users.each do |user, i|
+        users2.each do |user, i|
           row_data << generate_rating(user, book, @rel_fq)
         end
         csv << [book.ISBN] + row_data
@@ -65,6 +67,25 @@ class User < ActiveRecord::Base
         elsif random > fq[user.id][i-1] && random <= value
           return i+1
         end
+      end
+    end
+  end
+
+  def self.pearson_matrix
+    CSV.open("pearson_matrix.csv", "w") do |csv|
+      csv << [""] + users2.map(&:id)
+      users2.each do |user1|
+        pearson_co = []
+        users2.each do |user2|
+          if user1.id == user2.id
+            pearson_co << "x"
+          else
+            sxy = sxy(user1.ratings, user2.ratings) rescue 0
+            sxsy = sxsy(user1.ratings, user2.ratings) rescue 0
+            pearson_co << ((sxy.zero? || sxsy.zero?) ? 0.0 : (sxy / sxsy))
+          end
+        end
+        csv << [user1.id] + pearson_co
       end
     end
   end
