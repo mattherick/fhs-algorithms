@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
   def self.users2
     User.joins(:ratings).where("`BX-Book-Ratings`.`Book-Rating` > 0")
       .group("`BX-Users`.`User-ID`")
-      .order("count(`BX-Book-Ratings`.`Book-Rating`) DESC").limit(10)
+      .order("count(`BX-Book-Ratings`.`Book-Rating`) DESC").limit(50)
   end
 
   def self.generate_csv
@@ -77,7 +77,7 @@ class User < ActiveRecord::Base
       # row[0] = isbn
       # row[1] = user1
       # row[2] = user2
-      (1..2).each do |i|
+      (1..50).each do |i|
         ratings[i] ||= []
         ratings[i] << row[i].to_i
       end
