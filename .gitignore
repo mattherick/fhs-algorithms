@@ -16,3 +16,5 @@
 
 /config/database.yml
 .rbenv-version
+
+.DS_Store
