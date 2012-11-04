@@ -20,7 +20,7 @@ class User < ActiveRecord::Base
       .group("`BX-Users`.`User-ID`")
       .order("count(`BX-Book-Ratings`.`Book-Rating`) DESC").limit(2)
     
-    @rel_fq, @intervals = {}, {} # relative frequency = relative Haeufigkeit
+    @rel_fq = {} # relative frequency = relative Haeufigkeit
     @users.each do |user|
       (1..10).each do |i|
         @rel_fq[user.id] ||= []
@@ -28,7 +28,6 @@ class User < ActiveRecord::Base
         count_per_rating = user.ratings_except0.where("`BX-Book-Ratings`.`Book-Rating` = #{i}").count
         @rel_fq[user.id] << count_per_rating/user.ratings_except0.count.to_f
       end
-      @intervals = user.generate_intervals(@intervals, @rel_fq)
     end
     
     CSV.open("generated_rating.csv", "w") do |csv|
@@ -37,38 +36,37 @@ class User < ActiveRecord::Base
       #Book.limit(10).each do |book|
         row_data = []
         @users.each do |user, i|
-          row_data << generate_rating(user, book, @intervals)
+          row_data << generate_rating(user, book, @rel_fq)
         end
         csv << [book.ISBN] + row_data
       end
     end
   end
 
-  def self.generate_rating user, book, intervals
+  def self.generate_rating user, book, fq
     if existing = user.ratings_except0.where(:ISBN => book.ISBN).first
       return existing.send("Book-Rating") # if a rating exists use that
     else
-      intervals[user.id].each_with_index do |value, i|
-        if value != 0
-          intervals[user.id][i] = intervals[user.id][i] - 1
-          @intervals = intervals
-          # 0..9 indexes so the new rating is from 1 to 10
-          # dependent on interval/relative frequency
-          return i + 1 
-        else
-          next
+      # geschaetzte verteilung errechnet durch relative haeufigkeit 
+      # 0 - 0.1    = 1
+      # 0.1 - 0.4  = 2
+      # 0.4 - 0.4  = 3
+      # 0.4 - 0.5  = 4
+      # 0.5 - 1    = 5
+      random = rand(0.0..1.0) # random float between 0-1
+
+      fq[user.id].each_with_index do |value, i|
+        value = value + fq[user.id][i-1] if i != 0
+
+        if i == 0 && random > 0.0 && random <= value
+          return 1
+        elsif i == 9 && random > value && random <= 1.0
+          return 10
+        elsif random > fq[user.id][i-1] && random <= value
+          return i+1
         end
       end
     end
-  end
-
-  def generate_intervals intervals, fq
-    intervals[self.id] ||= []
-    books_to_rate_count = Book.count - ratings_except0.count
-    fq[self.id].each_with_index do |value, i|
-      intervals[self.id][i] = (value * books_to_rate_count).round
-    end
-    intervals
   end
   
   # Task 1b
