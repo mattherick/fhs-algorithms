@@ -20,7 +20,7 @@ class User < ActiveRecord::Base
       .group("`BX-Users`.`User-ID`")
       .order("count(`BX-Book-Ratings`.`Book-Rating`) DESC").limit(2)
     
-    @rel_fq = {} # relative frequency = relative Haeufigkeit
+    @rel_fq, @intervals = {}, {} # relative frequency = relative Haeufigkeit
     @users.each do |user|
       (1..10).each do |i|
         @rel_fq[user.id] ||= []
@@ -28,50 +28,47 @@ class User < ActiveRecord::Base
         count_per_rating = user.ratings_except0.where("`BX-Book-Ratings`.`Book-Rating` = #{i}").count
         @rel_fq[user.id] << count_per_rating/user.ratings_except0.count.to_f
       end
-    end
-    
-    @intervals = {}
-    @users.each do |user|
-      @intervals[user.id] ||= []
-      user.generate_intervals(@intervals, @rel_fq)
+      @intervals = user.generate_intervals(@intervals, @rel_fq)
     end
     
     CSV.open("generated_rating.csv", "w") do |csv|
       csv << [""] + @users.map(&:id)
       Book.all.each do |book|
+      #Book.limit(10).each do |book|
         row_data = []
         @users.each do |user, i|
-          row_data << generate_rating(user, book, @rel_fq, @intervals)
+          row_data << generate_rating(user, book, @intervals)
         end
         csv << [book.ISBN] + row_data
       end
     end
   end
 
-  # user, book, relative frequency (Hash), intervals
-  def self.generate_rating user, book, fq, intervals
+  def self.generate_rating user, book, intervals
     if existing = user.ratings_except0.where(:ISBN => book.ISBN).first
-      rating = existing.send("Book-Rating")
+      return existing.send("Book-Rating") # if a rating exists use that
     else
       intervals[user.id].each_with_index do |value, i|
         if value != 0
           intervals[user.id][i] = intervals[user.id][i] - 1
           @intervals = intervals
-          return rating = i + 1
+          # 0..9 indexes so the new rating is from 1 to 10
+          # dependent on interval/relative frequency
+          return i + 1 
         else
           next
         end
       end
     end
-    rating
   end
 
   def generate_intervals intervals, fq
+    intervals[self.id] ||= []
     books_to_rate_count = Book.count - ratings_except0.count
     fq[self.id].each_with_index do |value, i|
       intervals[self.id][i] = (value * books_to_rate_count).round
     end
-    @intervals = intervals
+    intervals
   end
   
   # Task 1b
