@@ -72,20 +72,30 @@ class User < ActiveRecord::Base
   end
 
   def self.pearson_matrix
+    ratings = {}
+    CSV.foreach(open("generated_rating.csv"), {headers: true}) do |row|
+      # row[0] = isbn
+      # row[1] = user1
+      # row[2] = user2
+      (1..2).each do |i|
+        ratings[i] ||= []
+        ratings[i] << row[i].to_i
+      end
+    end
     CSV.open("pearson_matrix.csv", "w") do |csv|
       csv << [""] + users2.map(&:id)
-      users2.each do |user1|
+      ratings.each do |userid1, ratings_arr1|
         pearson_co = []
-        users2.each do |user2|
-          if user1.id == user2.id
+        ratings.each do |userid2, ratings_arr2|
+          if userid1 == userid2
             pearson_co << "x"
           else
-            sxy = sxy(user1.ratings, user2.ratings) rescue 0
-            sxsy = sxsy(user1.ratings, user2.ratings) rescue 0
+            sxy = sxy(ratings_arr1, ratings_arr2) rescue 0
+            sxsy = sxsy(ratings_arr1, ratings_arr2) rescue 0
             pearson_co << ((sxy.zero? || sxsy.zero?) ? 0.0 : (sxy / sxsy))
           end
         end
-        csv << [user1.id] + pearson_co
+        csv << [users2.map(&:id)[userid1-1]] + pearson_co
       end
     end
   end
