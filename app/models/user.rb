@@ -23,50 +23,54 @@ class User < ActiveRecord::Base
   end
 
   def self.generate_csv
-    @rel_fq = {} # relative frequency = relative Haeufigkeit
+    rel_fq, existing_ratings, new_ratings = {}, {}, {} # relative frequency = relative Haeufigkeit
     users2.each do |user|
       (1..10).each do |i|
-        @rel_fq[user.id] ||= []
+        rel_fq[user.id] ||= []
         # relative Haeufigkeit, zB (Anzahl der 1en)/10
         count_per_rating = user.ratings_except0.where("`BX-Book-Ratings`.`Book-Rating` = #{i}").count
-        @rel_fq[user.id] << count_per_rating/user.ratings_except0.count.to_f
+        rel_fq[user.id] << count_per_rating/user.ratings_except0.count.to_f
+      end
+      # existing ratings
+      user.ratings_except0.each do |rating|
+        existing_ratings[rating.ISBN] ||= {}
+        existing_ratings[rating.ISBN][user.id] = rating.send("Book-Rating")
+      end
+
+      # generates new rating if it doesn't exists
+      Book.all.each do |book|
+        new_ratings[book.ISBN] ||= []
+        existing = existing_ratings[book.ISBN][user.id] rescue nil
+        new_ratings[book.ISBN] << (existing || generate_rating(user, rel_fq))
       end
     end
-    
+
     CSV.open("generated_rating.csv", "w") do |csv|
       csv << [""] + users2.map(&:id)
-      Book.all.each do |book|
-        row_data = []
-        users2.each do |user, i|
-          row_data << generate_rating(user, book, @rel_fq)
-        end
-        csv << [book.ISBN] + row_data
+      new_ratings.each do |isbn, ratings|
+        csv << [isbn] + ratings
       end
     end
   end
 
-  def self.generate_rating user, book, fq
-    if existing = user.ratings_except0.where(:ISBN => book.ISBN).first
-      return existing.send("Book-Rating") # if a rating exists use that
-    else
-      # geschaetzte verteilung errechnet durch relative haeufigkeit 
-      # 0 - 0.1    = 1
-      # 0.1 - 0.4  = 2
-      # 0.4 - 0.4  = 3
-      # 0.4 - 0.5  = 4
-      # 0.5 - 1    = 5
-      random = rand(0.0..1.0) # random float between 0-1
+  def self.generate_rating user, fq
+    # geschaetzte verteilung errechnet durch relative haeufigkeit 
+    # 0 - 0.1    = 1
+    # 0.1 - 0.4  = 2
+    # 0.4 - 0.4  = 3
+    # 0.4 - 0.5  = 4
+    # 0.5 - 1    = 5
+    random = rand(0.0..1.0) # random float between 0-1
 
-      fq[user.id].each_with_index do |value, i|
-        value = value + fq[user.id][i-1] if i != 0
+    fq[user.id].each_with_index do |value, i|
+      value = value + fq[user.id][i-1] if i != 0
 
-        if i == 0 && random > 0.0 && random <= value
-          return 1
-        elsif i == 9 && random > value && random <= 1.0
-          return 10
-        elsif random > fq[user.id][i-1] && random <= value
-          return i+1
-        end
+      if i == 0 && random > 0.0 && random <= value
+        return 1
+      elsif i == 9 && random > value && random <= 1.0
+        return 10
+      elsif random > fq[user.id][i-1] && random <= value
+        return i+1
       end
     end
   end
