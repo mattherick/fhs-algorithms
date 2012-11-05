@@ -91,13 +91,9 @@ class User < ActiveRecord::Base
       ratings.each do |userid1, ratings_arr1|
         pearson_co = []
         ratings.each do |userid2, ratings_arr2|
-          if userid1 == userid2
-            pearson_co << "x"
-          else
-            sxy = sxy(ratings_arr1, ratings_arr2) rescue 0
-            sxsy = sxsy(ratings_arr1, ratings_arr2) rescue 0
-            pearson_co << ((sxy.zero? || sxsy.zero?) ? 0.0 : (sxy / sxsy))
-          end
+          sxy = sxy(ratings_arr1, ratings_arr2) rescue 0
+          sxsy = sxsy(ratings_arr1, ratings_arr2) rescue 0
+          pearson_co << ((sxy.zero? || sxsy.zero?) ? 0.0 : (sxy / sxsy))
         end
         csv << [users2.map(&:id)[userid1-1]] + pearson_co
       end
