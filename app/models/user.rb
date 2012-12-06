@@ -138,10 +138,10 @@ class User < ActiveRecord::Base
 
   def self.random
     user = User.find(16795)
-    user.ratings.where(:ISBN => (same_books - same_ratings)).each do |rating|
-      puts rating.isbn
-      puts "old: " + rating.send("Book-Rating")
-      puts "new: " + rand(1..10)
+    user.ratings.where(:ISBN => same_ratings).each do |rating|
+      puts rating.ISBN
+      puts "old: " + rating.send("Book-Rating").to_s
+      puts "new: " + rand(1..10).to_s
     end
   end
 
@@ -163,16 +163,12 @@ class User < ActiveRecord::Base
 
     slope_one = SlopeOne.new
     slope_one.insert(user_data)
-     # def predict(user)
-     #  preds, freqs = {}, {}
-
-     #  user.each do |item, rating|
     puts slope_one.predict(user_data2).inspect
   end
 
   def self.same_books
     user = User.find(16795)
-    array = user_with_most_ratings.books.map(&:ISBN) + user.books.map(&:ISBN)
+    array = user_with_most_ratings.ratings_except0.map(&:ISBN) + user.ratings_except0.map(&:ISBN)
     dup = array.select{|element| array.count(element) > 1 }
     dup.uniq.slice(0,50)
   end
@@ -181,8 +177,8 @@ class User < ActiveRecord::Base
     user = User.find(16795)
     books_with_same_ratings = []
     same_books.each do |isbn|
-      rating = user_with_most_ratings.ratings.where(:ISBN => isbn).first.send("Book-Rating")
-      if rating == user.ratings.where(:ISBN => isbn).first.send("Book-Rating")
+      rating = user_with_most_ratings.ratings_except0.where(:ISBN => isbn).first.send("Book-Rating")
+      if rating == user.ratings_except0.where(:ISBN => isbn).first.send("Book-Rating")
         books_with_same_ratings << isbn
       end
     end
