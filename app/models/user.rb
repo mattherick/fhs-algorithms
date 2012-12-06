@@ -110,7 +110,8 @@ class User < ActiveRecord::Base
   end
   
   def self.users
-    User.joins(:ratings).where(
+    User.joins(:ratings).where("`BX-Book-Ratings`.`Book-Rating` > 0")
+    .where(
       "BX-Book-Ratings.ISBN" => user_with_most_ratings.ratings.map(&:ISBN)
     ).group("`BX-Users`.`User-ID`").having("count(`BX-Book-Ratings`.`Book-Rating`) >= 200")
   end
@@ -133,6 +134,59 @@ class User < ActiveRecord::Base
       .group("`BX-Users`.`User-ID`")
       .order("count(`BX-Book-Ratings`.`Book-Rating`) DESC")
       .limit(1).first
+  end
+
+  def self.random
+    user = User.find(16795)
+    user.ratings.where(:ISBN => (same_books - same_ratings)).each do |rating|
+      puts rating.isbn
+      puts "old: " + rating.send("Book-Rating")
+      puts "new: " + rand(1..10)
+    end
+  end
+
+  def self.slope_one
+    user = User.find(16795)
+    user_data = {}
+    user_data[user_with_most_ratings.id] = {}
+    user_with_most_ratings.ratings.where(:ISBN => same_books).each do |rating|
+      user_data[user_with_most_ratings.id][rating.ISBN] = {}
+      user_data[user_with_most_ratings.id][rating.ISBN] = rating.send("Book-Rating")
+    end
+
+    user_data2 = {}
+    isbns = same_books - same_ratings
+    user.ratings.where(:ISBN => isbns).each do |rating|
+      user_data2[rating.ISBN] = {}
+      user_data2[rating.ISBN] = rating.send("Book-Rating")
+    end
+
+    slope_one = SlopeOne.new
+    slope_one.insert(user_data)
+     # def predict(user)
+     #  preds, freqs = {}, {}
+
+     #  user.each do |item, rating|
+    puts slope_one.predict(user_data2).inspect
+  end
+
+  def self.same_books
+    user = User.find(16795)
+    array = user_with_most_ratings.books.map(&:ISBN) + user.books.map(&:ISBN)
+    dup = array.select{|element| array.count(element) > 1 }
+    dup.uniq.slice(0,50)
+  end
+
+  def self.same_ratings
+    user = User.find(16795)
+    books_with_same_ratings = []
+    same_books.each do |isbn|
+      rating = user_with_most_ratings.ratings.where(:ISBN => isbn).first.send("Book-Rating")
+      if rating == user.ratings.where(:ISBN => isbn).first.send("Book-Rating")
+        books_with_same_ratings << isbn
+      end
+    end
+    books_with_same_ratings
   end
 
 end
